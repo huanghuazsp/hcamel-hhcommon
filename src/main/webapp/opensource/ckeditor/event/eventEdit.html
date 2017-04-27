@@ -1,0 +1,101 @@
+<html>
+<head>
+<title>日期控件</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<script type="text/javascript">
+	var theme = 'base';
+</script>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<script type="text/javascript" src="../../jquery/web/jquery-1.9.1.js"></script>
+<link id="jqueryuicss" rel="stylesheet" type="text/css"
+	href="../../jquery/jui/themes/base/jquery-ui.css" />
+<script type="text/javascript" src="../../jquery/jui/ui/jquery-ui.js"></script>
+<script type="text/javascript"
+	src="../../jquery/validation/jquery.validationEngine-zh_CN.js"></script>
+<script type="text/javascript"
+	src="../../jquery/validation/jquery.validationEngine.js"></script>
+<script type="text/javascript" src="../../jquery/mainframe.js"></script>
+<link rel="stylesheet" type="text/css"
+	href="../../jquery/hhjqueryui.css" />
+<script type="text/javascript" src="../../jquery/hhjqueryui.js"></script>
+<script type="text/javascript" src="event.js"></script>
+<script type="text/javascript">
+	var width = 650;
+	var height = 500;
+	var frameId = 'eventFrameId';
+	var row = params.row || {
+		id : $.hh.getUUID()
+	}
+
+	params.row = row;
+
+	function doSave() {
+		$.hh.validation.check('form', function(formData) {
+			var subframe = window.frames[frameId].getValues();
+			if (subframe) {
+				$.extend(formData, subframe);
+			} else {
+				return;
+			}
+			params.callback(formData);
+			Dialog.closethis();
+		});
+	}
+	var comboboxConfig = {
+		name : 'eventType',
+		defautlValue : 'setValue',
+		onChange : function(value) {
+			if (value) {
+				$('#' + frameId).attr('src', value + '.html');
+			}
+		},
+		data : [ {
+			id : 'setValue',
+			text : '设值'
+		}, {
+			id : 'loadSubComboData',
+			text : '加载子下拉框数据'
+		} ]
+	}
+
+	function init() {
+		$.hh.setFrameParams(frameId, params);
+		$('#form').setValue(row);
+		var eventType = $('#span_eventType').getValue();
+		if (eventType) {
+			$('#' + frameId).attr('src', eventType + '.html');
+		}
+	}
+
+	function setHeight(height) {
+		$('#' + frameId).height(height - 150);
+	}
+</script>
+</head>
+<body>
+	<div xtype="hh_content" style="overflow: visible;">
+		<form id="form" xtype="form">
+			<span xtype="text" config=" hidden:true,name : 'id'"></span>
+			<table xtype="form">
+				<tr>
+					<td xtype="label">事件类别：</td>
+					<td><span xtype="combobox" configVar="comboboxConfig"></span></td>
+				</tr>
+				<tr>
+					<td xtype="label">事件名称：</td>
+					<td><span xtype="text"
+						config="name : 'eventName' ,required:true "></span></td>
+				</tr>
+			</table>
+			<hr />
+			<iframe id="eventFrameId" name="eventFrameId" width=100% height=100%
+				frameborder=0 src=""></iframe>
+		</form>
+	</div>
+	<div xtype="toolbar">
+		<span xtype="button" config="onClick : doSave ,text : '保存'  "></span>
+	</div>
+
+</body>
+</html>

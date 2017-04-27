@@ -1,0 +1,98 @@
+<html>
+<head>
+<title>日期控件</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<script type="text/javascript">
+	var theme = 'base';
+</script>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<script type="text/javascript" src="../../jquery/web/jquery-1.9.1.js"></script>
+<link id="jqueryuicss" rel="stylesheet" type="text/css"
+	href="../../jquery/jui/themes/base/jquery-ui.css" />
+<script type="text/javascript" src="../../jquery/jui/ui/jquery-ui.js"></script>
+<script type="text/javascript"
+	src="../../jquery/validation/jquery.validationEngine-zh_CN.js"></script>
+<script type="text/javascript"
+	src="../../jquery/validation/jquery.validationEngine.js"></script>
+<script type="text/javascript" src="../../jquery/mainframe.js"></script>
+<link rel="stylesheet" type="text/css"
+	href="../../jquery/hhjqueryui.css" />
+<script type="text/javascript" src="../../jquery/hhjqueryui.js"></script>
+<script type="text/javascript">
+var width = 700;
+var height = 450;
+var params = $.hh.getIframeParams();
+function doAdd() {
+	Dialog.open({
+		url : '/hhcommon/opensource/ckeditor/event/eventEdit.html',
+		params : {
+			data : params.data,
+			callback : function(data) {
+				var dataList = $('#pagelist').data('data') || [];
+				dataList.push(data);
+				$('#pagelist').loadData({
+					data : dataList
+				});
+			}
+		}
+	});
+}
+
+function doEdit() {
+	$.hh.pagelist.callRow("pagelist", function(row) {
+		Dialog.open({
+			url : '/hhcommon/opensource/ckeditor/event/eventEdit.html',
+			params : {
+				row : row,
+				data : params.data,
+				callback : function(data) {
+					$("#pagelist").getWidget().updateRow(data);
+				}
+			}
+		});
+	});
+}
+
+function doDelete() {
+	$.hh.pagelist.callRow("pagelist", function(row) {
+		$("#pagelist").getWidget().deleteRow(row);
+	});
+}
+
+function doSave() {
+	params.callback($('#pagelist').data('data') || []);
+	Dialog.closethis();
+}
+
+var pagelistConfig = {
+	paging : false,
+	column : [ {
+		name : 'eventName',
+		text : '名称'
+	} ],
+	data : params.eventList
+}
+
+function init() {
+
+}
+</script>
+</head>
+<body>
+	<div xtype="hh_content" style="overflow: visible;">
+		<div xtype="toolbar" config="type:'head'">
+			<span xtype="button" config="onClick:doAdd,text:'添加' , itype :'add' "></span>
+			<span xtype="button"
+				config="onClick:doEdit,text:'修改' , itype :'edit' "></span> <span
+				xtype="button"
+				config="onClick:doDelete,text:'删除' , itype :'delete' "></span>
+		</div>
+		<div id="pagelist" xtype="pagelist" configVar=" pagelistConfig"></div>
+	</div>
+	<div xtype="toolbar">
+		<span xtype="button"
+			config="onClick : doSave ,text : '保存' ,itype:'save' "></span>
+	</div>
+</body>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>上传图片</title>
+<!-- <link rel="stylesheet"
+	href="/common/jquery/mobile/jquery.mobile-1.4.0.min.css"
+	type="text/css" />
+	 -->
+<link rel="stylesheet" href="/common/jquery/mobile/lawyee.min.css" />
+<link rel="stylesheet" href="/common/jquery/mobile/jquery.mobile.icons.min.css" />
+<link rel="stylesheet" href="/common/jquery/mobile/jquery.mobile.structure-1.4.0.min.css" />
+	
+<script type="text/javascript" src="/common/jquery/jquery-1.9.1.js"></script>
+<script type="text/javascript"
+	src="/common/jquery/mobile/jquery.mobile-1.4.0.min.js"></script>
+<link rel="stylesheet" href="/common/jquery/lymobile/framework.css"
+	type="text/css">
+<script type="text/javascript"
+	src="/common/jquery/lymobile/framework.js"></script>
+<script type="text/javascript" src="/common/plugins/upload/ajaxfileupload.js"></script>	
+<script src="/common/jquery/validation/jquery.validationEngine-zh_CN.js" type="text/javascript"></script>
+<script src="/common/jquery/validation/jquery.validationEngine.js" type="text/javascript"></script>
+</head>
+<body>
+	<div data-role="page" type="uploadPicPage">
+		<div data-role="header" data-theme="">
+			<h1>上传图片</h1>
+		</div>
+		<form action="" method="post" enctype="multipart/form-data"
+			data-ajax="false" type="uploadPicForm">
+			<!-- <input type='hidden' name='entityName' value='fileUpload.asyncFile'/> -->
+			<div data-role="content" type="uploadPic" style="text-align:center;">
+				<div data-role="navbar">
+					<ul>
+						<li><a type="selectTreeCancel"
+							class="ui-btn ui-shadow ui-corner-all">取消</a></li>
+						<li><a type="muploadPicOk"
+							class="ui-btn ui-shadow ui-corner-all">确定</a></li>
+					</ul>
+				</div>
+				<br/><br/>
+			</div>
+
+		</form>
+
+		<script>
+			$(function() {
+				
+				var params = $.lawyee.getIframeParams();
+				var span = params.span;
+				var ulid = span.attr('uploadPicId');
+				
+				var uploadPicUrl;
+				var picvalidate_size_msg;
+				uploadPicUrl = span.data("uploadPicUrl");
+				var fileid = "file" + ulid
+				picvalidate_size_msg = span.data("picvalidate_size_msg");
+
+				$("[type=uploadPic]")
+						.append(
+								'<input name="'+fileid+'" id="'+fileid+'" value="" class="validate[required,custom[onlyImage]]" type="file">');
+
+				$('[type=uploadPicForm]').validationEngine({
+					scroll : false
+				});
+
+
+				$('[type=selectTreeCancel]').click(function(){
+					$.lawyee.close();
+				});
+
+				$('[type=muploadPicOk]')
+						.click(
+								function() {
+									if (!$('[type=uploadPicForm]')
+											.validationEngine('validate')) {
+										$.lawyee.info('选中文件不是图片类型！');
+										return false;
+									}
+									$
+											.ajaxFileUpload({
+												url : uploadPicUrl, //需要链接到服务器地址
+												secureuri : false,
+												async : false,
+												data : {
+													date : new Date()
+												},
+												fileElementId : fileid, //文件选择框的id属性
+												dataType : 'text', //服务器返回的格式，可以是json
+												success : function(data,
+														textStatus) { //相当于java中try语句块的用法
+													if(data.indexOf('pre-wrap;"&gt;')>-1){
+														data=data.substr(data.indexOf('pre-wrap;"&gt;')+14);
+														//$.lawyee.info(data);
+													}
+													
+											
+													data = eval('('+data.replace('<PRE style="word-wrap: break-word; white-space: pre-wrap;">','').replace('<pre style="word-wrap: break-word; white-space: pre-wrap;">','').replace('<pre>','').replace('</pre>','').replace('<PRE>','').replace('</PRE>','')+')');
+													if(data.code==10){
+														  $.lawyee.info(picvalidate_size_msg+"附件超过验证大小！");
+													}
+													if (data.fileId) {
+														span.setValue(data.fileId);
+														span.data('value',data.fileId);
+													} else {
+														$.lawyee.info("上传失败！");
+														return false;
+													}
+													$('input[id^=jUploadFile]').remove();
+													$.lawyee.close();
+												},
+												error : function(data, status,
+														e) { //相当于java中catch语句块的用法
+													$.lawyee.info("上传失败！");
+													return false;
+												}
+											});
+
+								})
+
+			});
+		</script>
+	</div>
+</body>
+</html>

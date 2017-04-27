@@ -1,0 +1,238 @@
+<!doctype html>
+<html>
+<head>
+  <title>Graph 3D demo</title>
+
+  <style>
+    body {font: 10pt arial;}
+  </style>
+
+  <script type="text/javascript" src="dist/vis.js"></script>
+
+  <script type="text/javascript">
+    var data = null;
+    var graph = null;
+
+    function custom(x, y) {
+      return (Math.sin(x/50) * Math.cos(y/50) * 50 + 50);
+    }
+
+    // Called when the Visualization API is loaded.
+    function drawVisualization() {
+      // Create and populate a data table.
+      data = new vis.DataSet();
+      // create some nice looking data with sin/cos
+   /*    var counter = 0;
+      var steps = 50;  // number of datapoints will be steps*steps
+      var axisMax = 314;
+      var axisStep = axisMax / steps;
+      for (var x = 0; x < axisMax; x+=axisStep) {
+        for (var y = 0; y < axisMax; y+=axisStep) {
+          var value = custom(x,y);
+          data.add({id:counter++,x:x,y:y,z:value,style:value});
+        }
+      }  
+       var i =3000 ;
+      var x = -8492;
+      var y = 14359;
+      var z = 8071;
+      data.add({id:i,x:x,y:y,z:z,style:z});
+      i++
+      var x = -8025;
+      var y = 13570;
+      var z = 7239;
+      data.add({id:i,x:x,y:y,z:z,style:z});
+      i++
+      var x = -7760;
+      var y = 13122;
+      var z = 6276;
+      data.add({id:i,x:x,y:y,z:z,style:z});
+      i++
+      var x = -7786;
+      var y = 13166;
+      var z = 5944;
+      data.add({id:i,x:x,y:y,z:z,style:z});
+      i++
+      var x =- 6923;
+      var y = 11707;
+      var z = 4677;
+      data.add({id:i,x:x,y:y,z:z,style:z});
+      i++
+      var x = -6619;
+      var y = 11192;
+      var z = 4189;
+      data.add({id:i,x:x,y:y,z:z,style:z});
+      i++
+      var x =- 6087;
+      var y = 10293;
+      var z = 3596;
+      data.add({id:i,x:x,y:y,z:z,style:z});
+      i++
+      var x =-5817;
+      var y = 9836;
+      var z = 3195;
+      data.add({id:i,x:x,y:y,z:z,style:z});
+      i++
+      var x =-5656;
+      var y = 9565;
+      var z = 2876;
+      data.add({id:i,x:x,y:y,z:z,style:z});
+      i++
+      var x =-5092;
+      var y = 8610;
+      var z = 2182;
+      data.add({id:i,x:x,y:y,z:z,style:z});
+      i++
+      var x =-4866;
+      var y = 8228;
+      var z = 1893;
+      data.add({id:i,x:x,y:y,z:z,style:z});
+      i++
+      var x =-4834;
+      var y = 8174;
+      var z = 1692;
+      data.add({id:i,x:x,y:y,z:z,style:z});
+      i++
+      var x =-4560;
+      var y = 7710;
+      var z = 1420;
+      data.add({id:i,x:x,y:y,z:z,style:z});
+      i++
+      var x =-4438;
+      var y = 7505;
+      var z = 1212;
+      data.add({id:i,x:x,y:y,z:z,style:z});
+      i++		
+      var x =-4291;
+      var y = 7255;
+      var z = 1009;
+      data.add({id:i,x:x,y:y,z:z,style:z});
+      i++		
+      var x =-4125;
+      var y = 6976;
+      var z = 814;
+      data.add({id:i,x:x,y:y,z:z,style:z});
+      i++			
+      var x =-7552;
+      var y = 13436;
+      var z = 6425;
+      data.add({id:i,x:x,y:y,z:z,style:z});
+      i++			
+      var x =-7513;
+      var y = 13367;
+      var z = 6035;
+      data.add({id:i,x:x,y:y,z:z,style:z});
+      i++			
+      var x =-7117;
+      var y = 12662;
+      var z = 5385;
+      data.add({id:i,x:x,y:y,z:z,style:z});
+      i++	
+      var x =-6616;
+      var y = 11770;
+      var z = 4703;
+      data.add({id:i,x:x,y:y,z:z,style:z});
+      i++	
+      var x =-5872;
+      var y = 10447;
+      var z = 3650;
+      data.add({id:i,x:x,y:y,z:z,style:z});
+      i++	 
+      */
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      var dataStr = '0 364 0' + 'n';
+      dataStr +='0 364 0'+ 'n';
+      dataStr += '0 364 -8'+ 'n';
+      dataStr +='0 369 -16'+ 'n';
+      dataStr += '0 374 -25'+ 'n';
+      dataStr += '8 376 0'+ 'n';
+      dataStr += '8 381 -8'+ 'n';
+      dataStr +=  '8 381 -17'+ 'n';
+      dataStr += '8 381 -25'+ 'n';
+      
+      dataStr += '19 434 0'+ 'n';
+      dataStr += '19 434 -10'+ 'n';
+      
+      dataStr += '19 429 -28'+ 'n';
+      dataStr += '28 431 0'+ 'n';
+      dataStr += '28 431 -9'+ 'n';
+      dataStr += '28 431 -19'+ 'n';
+      dataStr += '28 429 -28'+ 'n';
+      dataStr += '19 431 -19'+ '';
+      
+     
+      
+      var lines = dataStr.split('n');
+      var dataList = [];
+      for(var i=0;i<lines.length;i++){
+    	  var line = lines[i];
+    	 var dataL = line.split(' ');
+    	 var data2 = {
+    			 x:parseInt(dataL[0]),
+    			 y :parseInt(dataL[2]),
+    			 z:parseInt(dataL[1]),
+    	 }
+    	 dataList.push(data2);
+    	 // data.add({id:i+6000,x:parseInt(dataL[0]),y:parseInt(dataL[2]),z:parseInt(dataL[1]),style:parseInt(dataL[1])});
+      }
+      var tempDataList = [];
+      for(var i=0;i<dataList.length;i++){
+    	  var data3 = dataList[i];
+    	  tempDataList.push(data3);
+    	  for(var j=0;j<dataList.length;j++){
+        	  var data2 = dataList[j];
+/*         	  tempDataList.push({
+        		  x : data2.x,
+        		  y : data3.y,
+        		  z : data3.z
+        	  });
+ */           }
+      }
+     
+    	  dataList =tempDataList
+      for(var i=0;i<dataList.length;i++){
+    	  var data2 = dataList[i];
+    	  data.add({id:i,x:data2.x,y:data2.y,z:data2.z,style:data2.z});
+      }
+		//console.log(data);
+      // specify options
+      var options = {
+        width:  '600px',
+        height: '600px',
+        style: 'bar',
+       // surface dot-color
+        showPerspective: true,
+        showGrid: true,
+        showShadow: false,
+        keepAspectRatio: true,
+        tooltip: function (point) {
+            // parameter point contains properties x, y, z
+            return 'x: <b>' + point.x + '</b><br>'+ 'y: <b>' + point.y + '</b><br>'+ 'z: <b>' + point.z + '</b><br>';
+          },
+        verticalRatio: 0.5
+      };
+
+      // Instantiate our graph object.
+      var container = document.getElementById('mygraph');
+      graph = new vis.Graph3d(container, data, options);
+    }
+  </script>
+</head>
+
+<body onload="drawVisualization();">
+<div id="mygraph"></div>
+
+<div id="info"></div>
+</body>
+</html>

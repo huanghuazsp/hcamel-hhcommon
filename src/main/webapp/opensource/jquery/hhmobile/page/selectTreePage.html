@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>树选择</title>
+<link rel="stylesheet" href="/common/jquery/mobile/jquery.mobile-1.4.0.min.css"	type="text/css">
+<script type="text/javascript" src="/common/jquery/jquery-1.9.1.js"></script>
+<script type="text/javascript" src="/common/jquery/mobile/jquery.mobile-1.4.0.min.js"></script>
+<link rel="stylesheet" href="/common/jquery/lymobile/framework.css"	type="text/css">
+<script type="text/javascript" src="/common/jquery/lymobile/framework.js"></script>
+</head>
+<body>
+	<div data-role="page" type="selectTreePage">
+		<div data-role="header"  data-theme="">
+			<h1>树选择</h1>
+		</div>
+		<div data-role="content" >
+			<span  type="selectTreePageBtn"  xtype="button" config="text:'上一级',onClick : selectTreeObject.parentClick"></span>
+			<span id="valuespan"></span>
+			<span  type="selectTreePageListview"  configVar="selectTreePageListviewConfig"></span>
+			
+			<div data-role="navbar" >
+				<ul>
+					<li>
+					<a type="selectTreeCancel"  class="ui-btn ui-shadow ui-corner-all">取消</a>
+					</li>
+					<li>
+					<a type="selectTreeOk" onClick="selectTreeObject.save()" class="ui-btn ui-shadow ui-corner-all">确定</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+		<script>
+			var selectTreeRequestParam = $.lawyee.getRequestParam($('[type=selectTreePage]').attr('data-url'));
+		
+			var selectTreePageListviewConfig = {
+					//title : 'name',
+					checkclick : function(data,input){
+						var checked = input.prop('checked');
+						if(selectTreePageListviewConfig.selectType=='radio'){
+							selectTreeObject.valueList=[];
+						}
+						if(checked){
+							selectTreeObject.addSelectList(data);
+						}else{
+							selectTreeObject.removeSelectList(data[selectTreeObject.id]);
+						}
+					},
+					itemRender: function(data){
+						if (data.isParent != true) {
+							return '<img class="ui-li-icon" src="/common/images/icons1/application_view_list.gif">&nbsp;'+(data.name||'');
+						}else{
+							return '<img class="ui-li-icon" src="/common/images/icons1/folder_page_white.gif">&nbsp;'+(data.name||'');
+						}
+					},
+					buttonItems : [{text:'下一级',click:function(data){
+						var dataList = null;
+						if(selectTreeObject.async){
+							selectTreeObject.paramsDataMap[data[selectTreeObject.id]] = data;
+							dataList = $.lawyee.request(selectTreeObject.url, {
+								data : data,
+								async : false
+							});
+							if(dataList && dataList.length>0){
+								selectTreeObject.hiid += ','+data[selectTreeObject.id];
+							}
+						}else{
+							dataList = selectTreeObject.getDataList(data[selectTreeObject.id]);
+						}
+						//selectTreePageListviewConfig.data = dataList;
+						if(dataList.length>0){
+							$('[type=selectTreePageListview]').getWidget().loadData({data:dataList});
+							$('[type="selectTreePageBtn"]').undisabled();
+						}else{
+							$.lawyee.info('没有下级数据！');
+						}
+					}}]
+			}
+			
+			var selectTreeObject = {
+				paramsDataMap : {},
+				save : function(){
+					var dataList = selectTreeObject.valueList;
+					
+					var id = "";
+					var text = "";
+					for(var i =0;i<dataList.length;i++){
+						var data = dataList[i];
+						id+=data[selectTreeObject.id]+",";
+						text+=data[selectTreeObject.text]+",";
+					}
+					if(id!=""){
+						id=id.substr(0,id.length-1);
+						text=text.substr(0,text.length-1);
+					}
+					var span = $.lawyee.getIframeParams().span;
+					
+					var resultObj ={};
+					resultObj.data = dataList;
+					resultObj.text=text;
+					resultObj.id=id;
+					if(selectTreeObject.async){
+						span.setValue(resultObj);
+					}else{
+						span.setValue(id);
+					}
+					
+					if(span.data('onChange')){
+						span.data('onChange')(span);	
+					}
+					$.lawyee.close();
+				},
+				parentClick : function(){
+					var index =  selectTreeObject.hiid.lastIndexOf(',');
+					selectTreeObject.hiid=selectTreeObject.hiid.substr(0,index);
+					var dataList = [];
+					if(selectTreeObject.hiid=='root'){
+						$('[type="selectTreePageBtn"]').disabled();
+						if(selectTreeObject.async){
+							dataList = $.lawyee.request(selectTreeObject.url, {
+								async : false
+							});
+						}else{
+							selectTreeObject.hiid='';
+							dataList = selectTreeObject.getDataList('root');
+						}
+					}else{
+						var dataid =selectTreeObject.hiid.substr( selectTreeObject.hiid.lastIndexOf(',')+1);
+						selectTreeObject.hiid=selectTreeObject.hiid.substr(0,selectTreeObject.hiid.lastIndexOf(','));
+						if(selectTreeObject.async){
+							
+							selectTreeObject.hiid+=','+selectTreeObject.paramsDataMap[dataid][selectTreeObject.id]
+							dataList = $.lawyee.request(selectTreeObject.url, {
+								async : false,
+								data:selectTreeObject.paramsDataMap[dataid]
+							});
+						}else{
+							dataList = selectTreeObject.getDataList(dataid);
+						}
+					}
+					
+					//selectTreePageListviewConfig.data = dataList;
+					$('[type=selectTreePageListview]').getWidget().loadData({data:dataList});
+				},
+				hiid : '',
+				id:'id',
+				text:'name',
+				parentId:'parentId',
+				valueList : [],
+				dataList : [],
+				renderSpanHtml : function (){
+					var html ="";
+					for(var i=0;i<selectTreeObject.valueList.length;i++){
+						var valuedata = selectTreeObject.valueList[i];
+						html+='&nbsp;<span>'+valuedata[selectTreeObject.text];
+						html+='<img src="'+$.lawyee.resourePath+'lymobile/img/delete.png" onclick="selectTreeObject.removeSelectList(\''+valuedata[selectTreeObject.id]+'\')" />|</span>';
+					}
+					$('#valuespan').html(html);
+				},
+				isInSelectList : function (id){
+					var userList = [];
+					for(var i = 0;i<selectTreeObject.valueList.length; i++){
+						var valueList = selectTreeObject.valueList[i];
+						if(valueList[selectTreeObject.id]==id){
+							return true;
+						}
+					}
+					return false;
+				},
+				removeSelectList:function (id){
+					var userList = [];
+					for(var i = 0;i<selectTreeObject.valueList.length; i++){
+						var selectUser = selectTreeObject.valueList[i];
+						if(selectUser[selectTreeObject.id]!=id){
+							userList.push(selectUser);
+						}
+					}
+					selectTreeObject.valueList=userList;
+					selectTreeObject.renderSpanHtml();
+				},
+				addSelectList : function (object){
+					var isin = selectTreeObject.isInSelectList(object[selectTreeObject.id]);
+					if(isin==false){
+						selectTreeObject.valueList.push(object);
+						selectTreeObject.renderSpanHtml();
+					}
+				},
+				isParent : function(data){
+					if(selectTreeObject.async==true){
+						return data.isParent;
+					}
+					if(data.children){
+						return true;
+					}
+					var dataList = selectTreeObject.dataList;
+					for(var i=0;i<dataList.length;i++){
+						var data2 = dataList[i];
+						if(data[selectTreeObject.id]==data2[selectTreeObject.parentId]){
+							return true;
+							break;
+						}
+					}
+					return false;
+				},
+				getRootDataList : function(){
+					var rootNodes = [];
+					var dataList = selectTreeObject.dataList;
+					for(var i=0;i<dataList.length;i++){
+						var data = dataList[i];
+						var rootas = true;
+						for(var j=0;j<dataList.length;j++){
+							var data2 = dataList[j];
+							if(data.parentId == data2.id){
+								rootas = false;
+								break;
+							}
+						}
+						if(rootas){
+							data.isParent = selectTreeObject.isParent(data);
+							rootNodes.push(data);
+						}
+					}
+					return rootNodes;
+				},
+				getDataList : function(id){
+					var dataList = selectTreeObject.dataList;
+					var returnData = [];
+					
+					if(id=='root'){
+						selectTreeObject.hiid = 'root';
+						return  selectTreeObject.getRootDataList();
+					}
+					for(var i=0;i<dataList.length;i++){
+						var data = dataList[i];
+						if(data[selectTreeObject.parentId]==id){
+							data.isParent = selectTreeObject.isParent(data);
+							returnData.push(data);
+						}
+					}
+					if(returnData.length>0){
+						if(id!='root'){
+							selectTreeObject.hiid += ','+id;
+						}
+					}
+					return returnData;
+				}
+			}
+			
+			
+			$(function(){
+				
+				var span = $.lawyee.getIframeParams().span;
+				selectTreeObject.async = span.data('async');
+				if(selectTreeObject.async){
+					selectTreeObject.hiid='root';
+				}
+				selectTreeObject.url = span.data('url');
+				selectTreePageListviewConfig.selectType = span.data('selectType') || 'radio';
+				var exceptParent = span.data('exceptParent') || false;
+				
+				selectTreePageListviewConfig.itemRenderAfter = function(data,tr){
+					if(selectTreeObject.isInSelectList(data[selectTreeObject.id])){
+						tr.find('[inputtype=check]').prop(
+								"checked", true);
+					}
+					if(data.isParent!=true){
+						tr.find('[type=itemA]').remove();
+					}else{
+						if(exceptParent){
+							tr.find('[inputtype=check]').parent('span').remove();
+						}
+					}
+					
+					var treeItemRender = span.data('treeItemRender');
+					if(treeItemRender){
+						treeItemRender(data,tr);
+					}
+				}
+				
+				selectTreeObject.valueList = span.getValueData();
+				if(selectTreeObject.valueList==null){
+					selectTreeObject.valueList=[];
+				}
+				if (!$.isArray(selectTreeObject.valueList)) {
+					if(selectTreeObject.valueList){
+						selectTreeObject.valueList = [selectTreeObject.valueList];
+					}
+				}
+				var dataList = span.data('data');
+				selectTreeObject.dataList = dataList;
+				selectTreeObject.renderSpanHtml();
+				
+				selectTreePageListviewConfig.data = selectTreeObject.getDataList('root');
+				
+				$('[type=selectTreePageListview]').attr('xtype','pagelist');
+				$('[type=selectTreePageListview]').render();
+				
+				
+				$('[type=selectTreeCancel]').click(function(){
+					$.lawyee.close();
+				});
+				
+				$('[type="selectTreePageBtn"]').render();
+				$('[type="selectTreePageBtn"]').disabled();
+			});
+		</script>
+	</div>
+</body>
+</html>

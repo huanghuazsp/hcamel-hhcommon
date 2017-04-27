@@ -1,0 +1,480 @@
+
+
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>表单设计器</title>
+<link rel="shortcut icon" href="../../images/extjsico/icon.png" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<script type="text/javascript">
+	var contextPath = '/workflow';
+	var theme = '';
+</script>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<script type="text/javascript"
+	src="../jquery/web/jquery-1.9.1.js"></script>
+<link id="jqueryuicss" rel="stylesheet" type="text/css"
+	href="../jquery/jui/themes/base/jquery-ui.css" />
+<script type="text/javascript"
+	src="../jquery/jui/ui/jquery-ui.js"></script>
+<link rel="stylesheet" type="text/css"
+	href="../jquery/layout/layout-default-latest.css" />
+<script type="text/javascript"
+	src="../jquery/layout/jquery.layout-latest.min.js"></script>
+<script type="text/javascript"
+	src="ckeditor.js"></script>
+<script type="text/javascript"
+	src="../jquery/mainframe.js"></script>
+<link rel="stylesheet" type="text/css"
+	href="../jquery/hhjqueryui.css" />
+<script type="text/javascript"
+	src="../jquery/hhjqueryui.js"></script>
+<script type="text/javascript">
+	var hhckeditor = {
+		setup : function(config) {
+			this.setValue(config[this.id] || '');
+		},
+		commit : function(config) {
+			var value = this.getValue();
+			if (value) {
+				config[this.id] = value;
+			}
+		},
+		onOk : function(page, src, xtype, config) {
+			var editor = page.getParentEditor();
+			var field = editor.document.createElement('img');
+			field.setAttribute('src','/hhcommon/opensource/ckeditor/'+ src);
+			field.setAttribute('xtype', xtype);
+			editor.insertElement(field);
+
+			if (config == null) {
+				config = {};
+				page.commitContent(config);
+			}
+			for ( var p in config) {
+				if (config[p] == null || config[p] == '') {
+					delete config[p];
+				}
+			}
+			var configStr = $.hh.toString(config).replace(/\"/g,"'");
+			field.setAttribute('config', configStr.substr(1,
+					configStr.length - 2));
+
+			field.setAttribute('ztype', 'span');
+		},
+		onShow : function(page, iframeId) {
+			var e = page;
+			delete e.textField;
+			var d = e.getParentEditor().getSelection().getSelectedElement();
+			e.textField = d;
+			var config = {};
+			if (d) {
+				config = d.getAttribute('config');
+				if (config) {
+					config = $.hh.toObject('{' + config + '}');
+				}
+				if (config == null || config == '') {
+					config = {};
+				}
+			}
+			$('.cke_dialog').hide();
+			$('.cke_dialog_background_cover').hide();
+				Dialog.open({
+					url : iframeId,
+					params : {
+						callback : function(eventListResult) {
+							eventList = eventListResult;
+						}
+					}
+				});
+			
+			/* if (iframeId) {
+				var iframe = window.frames[iframeId];
+				if (iframe.setValues) {
+					iframe.setValues(config);
+				} else {
+					$.hh.iframeLoad(iframe, function() {
+						iframe.setValues(config);
+					});
+				}
+			} else {
+				e.setupContent(config);
+			} */
+		},
+		addButton : function(editor, commandname, xtype, label, icon) {
+			editor.addCommand(commandname, new CKEDITOR.dialogCommand(
+					commandname));
+			editor.ui.addButton(commandname, {
+				label : label,
+				icon : icon,
+				command : commandname
+			});
+			if (editor.addMenuItems) {
+				var object = {};
+				object[commandname] = {
+					label : label,
+					command : commandname,
+					icon : icon,
+					group : commandname
+				};
+				editor.addMenuItems(object);
+			}
+			if (editor.contextMenu) {
+				editor.contextMenu.addListener(function(element, selection) {
+					if (element != null
+							&& element.getAttribute('xtype') == xtype) {
+						var returnobj = {};
+						returnobj[commandname] = CKEDITOR.TRISTATE_OFF;
+						return returnobj;
+					}
+				});
+			}
+		},
+		addWidget : function(params) {
+			var wjj = params.wjj;
+			var xtype = params.xtype;
+			var text = params.text;
+			CKEDITOR.plugins
+					.add(
+							wjj,
+							{
+								init : function(editor) {
+									hhckeditor.addButton(editor, wjj, xtype,
+											text,
+											'plugins/'
+													+ wjj + '/' + wjj + '.jpg');
+
+									CKEDITOR.dialog
+											.add(
+													wjj,
+													function(a) {
+														return {
+															title : text,
+															minWidth : 150,
+															minHeight : 60,
+															onShow : function() {
+																hhckeditor
+																		.onShow(
+																				this,
+																				'jsp-form-properties-'
+																						+ xtype);
+															},
+															onOk : function() {
+																var values = window.frames['jsp-form-properties-'
+																		+ xtype]
+																		.getValues();
+																if (values == null) {
+																	return false;
+																}
+																hhckeditor
+																		.onOk(
+																				this,
+																				'plugins/'
+																						+ wjj
+																						+ '/'
+																						+ wjj
+																						+ '.jpg',
+																				xtype,
+																				values);
+															},
+															onLoad : function() {
+															},
+															contents : [ {
+																//id : 'info',
+																label : text,
+																title : text,
+																elements : [ {
+																	id : "iframe",
+																	type : "html",
+																	html : "弹出选择"
+																	//html : '<iframe src="properties/'+xtype+'.html" name="jsp-form-properties-'+xtype+'" id="jsp-form-properties-'+xtype+'" class="cke_pasteframe" style="width:100px;height:100px" frameborder="0"  allowTransparency="true" ></iframe>'
+																} ]
+															} ]
+														};
+													});
+								},
+								requires : [ 'fakeobjects' ]
+							});
+		}
+	}
+
+	var extraPlugins = '';
+	var formitems = [
+	//  'Form', 'Checkbox', 'Radio',
+	//'Textarea', 'Select', 'Button',
+	//, 'TextField', 
+	'hhtext', 'hhtextarea', 'hhcheck', 'hhcheckbox', 'hhradio', 'hhcombobox',
+			'hhitemselect', 'hhdate', 'hhuploadpic', 'hhfile','hhfileUpload', 'hhckeditor',
+			'hhselectUser', 'hhselectOrg', 'hhselectColor', 'hhtableitem' ];
+
+	for (var i = 0; i < formitems.length; i++) {
+		extraPlugins += formitems[i] + ','
+	}
+	var buttonitems = [];
+	for (var i = 0; i < buttonitems.length; i++) {
+		extraPlugins += buttonitems[i] + ','
+	}
+	extraPlugins = extraPlugins.substr(0, extraPlugins.length - 1);
+	window.onload = function() {
+		var editor = CKEDITOR
+				.replace(
+						'editor',
+						{
+							extraPlugins : extraPlugins,
+							toolbar : [
+									{
+										name : 'document',
+										items : [ 'Source', '-', 'NewPage',
+										//, 'Save',, 'DocProps','Preview', 'Print', '-',
+										'Templates' ]
+									},
+									{
+										name : 'clipboard',
+										items : [ 'Cut', 'Copy', 'Paste',
+												'PasteText', 'PasteFromWord',
+												'-', 'Undo', 'Redo' ]
+									},
+									{
+										name : 'editing',
+										items : [ 'Find', 'Replace', '-',
+												'SelectAll', '-',
+												'SpellChecker', 'Scayt' ]
+									},
+									{
+										name : 'basicstyles',
+										items : [ 'Bold', 'Italic',
+												'Underline', 'Strike',
+												'Subscript', 'Superscript',
+												'-', 'RemoveFormat' ]
+									},
+									{
+										name : 'paragraph',
+										items : [ 'NumberedList',
+												'BulletedList', '-', 'Outdent',
+												'Indent', '-', 'Blockquote',
+												'CreateDiv', '-',
+												'JustifyLeft', 'JustifyCenter',
+												'JustifyRight', 'JustifyBlock',
+												'-', 'BidiLtr', 'BidiRtl' ]
+									},
+									{
+										name : 'links',
+										items : [ 'Link', 'Unlink', 'Anchor' ]
+									},
+									{
+										name : 'insert',
+										items : [ 'Image', 'Flash', 'Table',
+												'HorizontalRule', 'Smiley',
+												'SpecialChar', 'PageBreak',
+												'Iframe' ]
+									},
+									{
+										name : 'styles',
+										items : [ 'Styles', 'Format', 'Font',
+												'FontSize' ]
+									},
+									{
+										name : 'colors',
+										items : [ 'TextColor', 'BGColor' ]
+									},
+									{
+										name : 'tools',
+										items : [ 'Maximize'/* , 'ShowBlocks', '-', 'About' */]
+									}, '/', {
+										name : 'forms',
+										items : formitems
+									}, {
+										name : 'buttons',
+										items : buttonitems
+									} ],
+							height : $.hh.browser.getHeight() - 180,
+							fullPage : false,
+							//contentsCss : '../jquery/hhjqueryui.css',
+							menu_groups : 'clipboard,form,tablecell,tablecellproperties,tablerow,tablecolumn,table,anchor,link,flash,checkbox,radio,textfield,hiddenfield,imagebutton,button,select,textarea,'
+									+ extraPlugins
+						});
+		CKEDITOR.plugins.registered.dialog.init = function(t) {
+			t.on("doubleclick", function(u) {
+				var xtype = u.data.dialog;
+				if ($(u.data.element.$).attr('xtype')) {
+					xtype = 'hh' + $(u.data.element.$).attr('xtype');
+				}
+				u.data.dialog && t.openDialog(xtype)
+				// u.data.dialog && t.openDialog(u.data.dialog)
+			}, null, null, 999);
+		};
+		CKEDITOR.instances['editor'].on("instanceReady", function() {
+			var toolId = '#cke_71';
+			if ($.hh.browser.type.indexOf('IE') > -1) {
+				toolId = '#cke_72';
+			}
+			$(toolId).find('a').each(
+					function() {
+						var ckeditor_a = $(this);
+						var background = ckeditor_a.find('span').eq(0).css(
+								'background-image');
+						var li = $('<li style="font-weight:normal;margin:2px;'
+								+ 'border :  1px solid '+$.hh.property.classObject.themeContent+'">'
+								+ '<table>'
+								+ '<tr>'
+								+ '<td>'
+								+ '<img width="16" height="16" src="'
+								+ (background.replace('url("', '').replace('url(', '').replace(
+										'");', '').replace(
+												');', '').replace(
+												')', ''))
+								+ '"	style="">'
+								+ '</td>' + '<td>' + ckeditor_a.attr('title')
+								+ '</td>' + '</tr>' + '</table>' + '	</li>');
+						if ($.hh.browser.type.indexOf('IE') > -1) {
+							li.attr('onclick', ckeditor_a.attr('onmouseup'));
+						} else {
+							li.attr('onclick', ckeditor_a.attr('onclick'));
+						}
+						li
+						.mouseover(
+								function() {
+									$(this)
+											.css(
+													'border',
+													'1px solid '
+															+ $.hh.property.classObject.themeHead);
+								})
+						.mouseout(
+								function() {
+									$(this)
+											.css(
+													'border',
+													'1px solid '
+															+ $.hh.property.classObject.themeContent);
+								});
+						$("#btn_menu").append(li);
+					});
+			$("#btn_menu").menu();
+			$(toolId).remove();
+		});
+	};
+
+	function getData() {
+		var html = CKEDITOR.instances.editor.getData().replace(/<img config/g,
+				'<span config').replace(/ztype="span" \/>/g, '></span>');
+		var jsonConfig = [];
+		var $html = $('<span>' + html + '</span>');
+		$html.find("[xtype]").each(function() {
+			var config = $(this).getConfig();
+			if (config.xtype != 'form') {
+				if (!config.text) {
+					config.text = config.name;
+				}
+				jsonConfig.push(config);
+			}
+		});
+		return {
+			html : html,
+			jsonConfigObject : jsonConfig,
+			eventListObject : eventList,
+			eventList : $.hh.toString(eventList),
+			jsonConfig : $.hh.toString(jsonConfig)
+		};
+	}
+	var text = '';
+	
+	function setData(data){
+		if(data.eventList){
+			eventList=$.hh.toObject(data.eventList);
+		}else{
+			eventList=[];
+		}
+		text = data.text;
+		Doing.show();
+		if(data.html){
+			CKEDITOR.instances.editor.setData(data.html.replace(
+					/<span config/g, '<img config').replace(/><\/span>/g,
+					'ztype="span" />'));
+		}else{
+			CKEDITOR.instances.editor.setData('');
+		}
+		Doing.hide();
+		/*if($.hh.browser.type.indexOf('IE')>-1){
+			try{
+				CKEDITOR.tools.callFunction(4,this);
+				setTimeout(function(){
+					CKEDITOR.tools.callFunction(4,this);
+					Doing.hide();
+				},500);
+			}catch(e){
+				Doing.hide();
+			}
+		}else{
+			Doing.hide();
+		}*/
+	}
+	
+	var eventList = [];
+
+	function openview() {
+		var data = getData();
+		parent.Request.submit('jsp-form-ckeditor-ckeditorview', {
+			html : data.html,
+			eventList : data.eventList,
+			title : text
+		});
+	}
+	
+	function updateHtml (){
+		parent.updateHtml(getData());
+	}
+	
+	function init() {
+	}
+
+	function doEventList() {
+		var data = getData();
+		data.eventList=data.eventListObject;
+		data.jsonConfig=data.jsonConfigObject;
+		Dialog.open({
+			url : '/hhcommon/opensource/ckeditor/event/eventList.html',
+			params : {
+				eventList : eventList,
+				data : data,
+				callback : function(eventListResult) {
+					eventList = eventListResult;
+				}
+			}
+		});
+	}
+
+	function set_height() {
+		$('#cke_1_contents').height($.hh.browser.getHeight() - 180);
+	}
+</script>
+<style>
+.ui-menu {
+	width: 100%;
+}
+</style>
+</head>
+<body>
+	<div xtype="border_layout">
+		<div config="render : 'west' ,resizable :false ,width:180 ">
+			<div xtype="toolbar" config="type:'head'"
+				style="height: 28px; text-align: center;">
+				<div style="margin: 5px 0px 0px 0px">控件列表</div>
+			</div>
+			<ul id="btn_menu"  style="border: 0px; background:#ffffff;">
+			</ul>
+		</div>
+		<div>
+			<div xtype="toolbar" config="type:'head'">
+				<span xtype="button"
+					config="onClick:updateHtml,text:'保存',itype:'save' "></span> <span
+					xtype="button"
+					config="onClick : openview,text : '预览' ,itype:'view' "></span> <span
+					xtype="button" config="onClick : doEventList ,text : '事件' ,icon:'hh_img_event' "></span>
+			</div>
+			<textarea id="editor" name="editor"></textarea>
+		</div>
+	</div>
+</body>
+</html>

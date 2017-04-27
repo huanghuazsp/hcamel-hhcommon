@@ -1,0 +1,52 @@
+<!DOCTYPE>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>百度地图</title>
+    <style type="text/css">
+        #mapDiv1 { height:500px; width:100%; margin:20px }
+    </style>
+
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=1.2"></script>	
+    <script type="text/javascript" src="http://api.map.baidu.com/library/TextIconOverlay/1.2/src/TextIconOverlay_min.js"></script>
+    <script type="text/javascript" src="http://api.map.baidu.com/library/MarkerClusterer/1.2/src/MarkerClusterer_min.js"></script>
+ </head>
+  <body>	
+    <input id="ipdinwei" type="button" value="ipnarj"  />
+    <div id="mapDiv1" ></div>
+  </body>
+   <script type="text/javascript">
+       var EXAMPLE_URL = "http://api.map.baidu.com/library/MarkerClusterer/1.2/examples/";
+       var map = new BMap.Map("mapDiv1");
+       map.enableScrollWheelZoom();
+       var point = new BMap.Point(116.404, 39.915);
+       map.centerAndZoom(point, 4);
+       
+       var marker = new BMap.Marker(point);
+       //map.addOverlay(marker);
+       
+       var rm = new BMapLib.TextIconOverlay(new BMap.Point(119.404753,26.05771), 50);
+
+       map.addOverlay(rm);
+
+       rm.addEventListener("click", function (e) {
+           alert("此处发生");
+       });
+       rm.addEventListener("mouseover", function (e) {
+           // console.log(e);
+       });
+       rm.addEventListener("mouseout", function (e) {
+           // console.log(e);
+       });
+
+        
+        var ipdinwei = document.getElementById('ipdinwei');
+        ipdinwei.onclick = function (event) {
+        	   // var b = new BMap.MercatorProjection().pointToLngLat(new BMap.Pixel(13524118.26, 3642780.37));
+	        	//var  pt = new BMap.Point(b.lng,b.lat);
+                var  pt = new BMap.Point(119.404753,26.05771);
+	        	map.addOverlay(new BMap.Marker(pt));
+        };
+
+    </script>
+</html>

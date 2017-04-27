@@ -1,0 +1,131 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ECharts</title>
+</head>
+
+<body>
+	<div id="main"
+		style="height: 500px; border: 1px solid #ccc; padding: 10px;"></div>
+
+	<script src="echarts.js"></script>
+	<script type="text/javascript">
+		require.config({
+			paths : {
+				echarts : './js'
+			}
+		});
+		option = {
+			title : {
+				text : '预警图',
+				x : 'center'
+			},
+			tooltip : {
+				trigger : 'item'
+			},
+			legend : {
+				orient : 'vertical',
+				x : 'left',
+				data : [ '' ]
+			},
+			dataRange : {
+				min : 0,
+				max : 500,
+				calculable : true,
+				color : [ 'maroon', 'purple', 'red', 'orange', 'yellow',
+						'lightgreen' ]
+			},
+			toolbox : {
+				show : true,
+				orient : 'vertical',
+				x : 'right',
+				y : 'center',
+				feature : {
+					mark : {
+						show : true
+					},
+					dataView : {
+						show : true,
+						readOnly : false
+					},
+					restore : {
+						show : true
+					},
+					saveAsImage : {
+						show : true
+					}
+				}
+			},
+			series : [ {
+				name : '预警地区',
+				type : 'map',
+				mapType : 'china',
+				data : [ ],
+				roam : true,
+				selectedMode : 'single',
+				itemStyle : {
+					normal : {
+						label : {
+							show : true
+						}
+					},
+					emphasis : {
+						label : {
+							show : true
+						}
+					}
+				},
+				geoCoord : {
+					 "福州":[119.3,26.08]
+				},
+				dataRange : {
+					calculable : true,
+					color : [ 'maroon', 'purple', 'red', 'orange', 'yellow',
+							'lightgreen' ]
+				},
+				markPoint : {
+					symbolSize : 5, // 标注大小，半宽（半径）参数，当图形为方向或菱形则总宽度为symbolSize * 2
+					itemStyle : {
+						normal : {
+							borderColor : '#87cefa',
+							borderWidth : 1, // 标注边线线宽，单位px，默认为1
+							label : {
+								show : false
+							}
+						},
+						emphasis : {
+							borderColor : '#1e90ff',
+							borderWidth : 5,
+							label : {
+								show : false
+							}
+						}
+					},
+					data : [ {
+						name : "福州",
+						value : 250
+					} ]
+				}
+			} ]
+		};
+
+		require([ 'echarts', 'echarts/chart/map' ], function(ec) {
+			var myChart = ec.init(document.getElementById('main'));
+			var ecConfig = require('echarts/config');
+			var zrEvent = require('zrender/tool/event');
+
+			myChart.on(ecConfig.EVENT.MAP_SELECTED, function(param) {
+				if (option.series[0].mapType == 'china') {
+					option.series[0].mapType = param.target;
+				} else {
+					option.series[0].mapType = 'china';
+				}
+				myChart.setOption(option, true);
+			});
+
+			myChart.setOption(option);
+		});
+	</script>
+</body>
+</html>

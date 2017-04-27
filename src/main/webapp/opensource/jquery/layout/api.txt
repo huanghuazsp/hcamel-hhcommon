@@ -1,0 +1,60 @@
+ applyDefaultStyles: true,//应用默认样式  
+ 6                 scrollToBookmarkOnLoad: false,//页加载时滚动到标签  
+ 7                 showOverflowOnHover: false,//鼠标移过显示被隐藏的，只在禁用滚动条时用。 
+ 8                 north__closable: false,//可以被关闭  
+ 9                 north__resizable: false,//可以改变大小  
+10                 north__size: 50,//pane的大小  
+11                 spacing_open: 8,//边框的间隙  
+12                 spacing_closed: 60,//关闭时边框的间隙  
+13                 resizerTip: "可调整大小",//鼠标移到边框时，提示语  
+14                 resizerCursor:"resize-p",// 鼠标移上的指针样式  
+15                 resizerDragOpacity: 0.9,//调整大小边框移动时的透明度  
+16                 maskIframesOnResize: "#ifa",//在改变大小的时候，标记iframe（未通过测试）  
+17                 sliderTip: "显示/隐藏侧边栏",//在某个Pane隐藏后，当鼠标移到边框上显示的提示语。  
+18                 sliderCursor: "pointer",//在某个Pane隐藏后，当鼠标移到边框上时的指针样式。  
+19                 slideTrigger_open: "dblclick",//在某个Pane隐藏后，鼠标触发其显示的事件。(click", "dblclick", "mouseover)  
+20                 slideTrigger_close: "click",//在某个Pane隐藏后，鼠标触发其关闭的事件。("click", "mouseout")  
+21                 togglerTip_open: "关闭",//pane打开时，当鼠标移动到边框上按钮上，显示的提示语  
+22                 togglerTip_closed: "打开",//pane关闭时，当鼠标移动到边框上按钮上，显示的提示语  
+23                 togglerLength_open: 100,//pane打开时，边框按钮的长度  
+24                 togglerLength_closed: 200,//pane关闭时，边框按钮的长度  
+25                 hideTogglerOnSlide: true,//在边框上隐藏打开/关闭按钮(测试未通过)  
+26                 togglerAlign_open: "left",//pane打开时，边框按钮显示的位置  
+27                 togglerAlign_closed: "right",//pane关闭时，边框按钮显示的位置  
+28                 togglerContent_open: "<div style='background:red'>AAA</div>",//pane打开时，边框按钮中需要显示的内容可以是符号"<"等。需要加入默认css样式.ui-layout-toggler .content   
+29                 togglerContent_closed: "<img/>",//pane关闭时，同上。  
+30                 enableCursorHotkey: true,//启用快捷键CTRL或shift + 上下左右。  
+31                 customHotkeyModifier: "shift",//自定义快捷键控制键("CTRL", "SHIFT", "CTRL+SHIFT"),不能使用alt  
+32                 south__customHotkey: "shift+0",//自定义快捷键（测试未通过）  
+33                 fxName: "drop",//打开关闭的动画效果  
+34                 fxSpeed: "slow"//动画速度  
+35                 //fxSettings: { duration: 500, easing: "bounceInOut" }//自定义动画设置(未通过测试)  
+36                 //initClosed:true,//初始时，所有pane关闭  
+37                 //initHidden:true //初始时，所有pane隐藏  
+38                 //onresize: ons,//调整大小时调用的函数  
+39                 //onshow_start: start,
+40                 //onshow_end: end
+41                 /* 
+42                 其他回调函数 
+43                  
+44                 显示时调用 
+45                 onshow = "" 
+46                 onshow_start = ""  
+47                 onshow_end = ""  
+48                 隐藏时调用 
+49                 onhide = ""  
+50                 onhide_start = ""  
+51                 onhide_end = ""  
+52                 打开时调用 
+53                 onopen = ""  
+54                 onopen_start = ""  
+55                 onopen_end = ""  
+56                 关闭时调用 
+57                 onclose = ""  
+58                 onclose_start = ""  
+59                 onclose_end = ""  
+60                 改变大小时调用 
+61                 onresize = ""  
+62                 onresize_start = ""  
+63                 onresize_end = ""  
+64                 */

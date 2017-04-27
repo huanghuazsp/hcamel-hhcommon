@@ -1,0 +1,42 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>颜色控件</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<script type="text/javascript">
+	var theme = 'base';
+</script>
+<script type="text/javascript" src="../../jquery/web/jquery-1.9.1.js"></script>
+<link  rel="stylesheet" type="text/css"
+	href="../../jquery/jui/themes/base/jquery-ui.css" />
+<script type="text/javascript" src="../../jquery/jui/ui/jquery-ui.js"></script>
+<script type="text/javascript"
+	src="../../jquery/validation/jquery.validationEngine-zh_CN.js"></script>
+<script type="text/javascript"
+	src="../../jquery/validation/jquery.validationEngine.js"></script>
+<script type="text/javascript" src="../../jquery/mainframe.js"></script>
+<link rel="stylesheet" type="text/css"
+	href="../../jquery/hhjqueryui.css" />
+<script type="text/javascript" src="../../jquery/hhjqueryui.js"></script>
+<script type="text/javascript" src="../../jquery/util/pinyin.js"></script>
+<script type="text/javascript" src="form.js"></script>
+<script type="text/javascript">
+</script>
+<script type="text/javascript">
+	
+</script>
+</head>
+<body>
+	<form id="form" xtype="form">
+		<table xtype="form">
+			<tr>
+				<td xtype="label">中文名称：</td>
+				<td><span xtype="text" config=" name : 'textfield' ,blur: zwblur "></span></td>
+				<td xtype="label">名称：<img id="refreshName" style="cursor:pointer;"  src="../../jquery/image/16/refresh.png"  title="根据中文名获取拼音"  /></td>
+				<td ><span xtype="text" config=" name : 'name',required :true"></span></td>
+			</tr>
+		</table>
+	</form>
+</body>
+</html>

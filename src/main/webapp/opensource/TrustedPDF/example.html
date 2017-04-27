@@ -1,0 +1,81 @@
+﻿<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>DJWebOffice</title>
+</head>
+<script defer="defer" ID=clientEventHandlersJS type="text/javascript">
+	function TrustedPDF1_Close() { 
+		try{
+			var pdfObj=document.getElementById("TrustedPDF1");
+			pdfObj.CloseDoc(false);
+		}catch(e){
+			//alert("异常\r\nError:"+e+"\r\nError Code:"+e.number+"\r\nError Des:"+e.description);
+		}
+	}
+	function TrustedPDF1_NotifyCtrlReady(url) {
+		TrustedPDF1_Close();
+		if(url !=null && url != ""){
+			try{
+				var pdfObj=document.getElementById("TrustedPDF1");
+				pdfObj.LoadFile(url);	
+			}catch(e){
+				//alert("异常\r\nError:"+e+"\r\nError Code:"+e.number+"\r\nError Des:"+e.description);
+			}
+		}
+	}
+	function init(){
+		TrustedPDF1_NotifyCtrlReady("<%=url%>");
+		var pdfObj=document.getElementById("TrustedPDF1");
+		pdfObj.ForceSignType2 = pdfObj.ForceSignType2|0x02;//处于内部调用状态,这时可能会不弹出某些操作提示
+		pdfObj.ForceSignType = pdfObj.ForceSignType|0x80000000;//进入pdf模式
+	}
+	function Test()
+{
+	var pdfObj=document.getElementById("TrustedPDF1");
+				pdfObj.LoadFile("F:\\undefined.pdf");	
+}
+</script>
+<SCRIPT LANGUAGE=javascript FOR=TrustedPDF1 EVENT=NotifyCtrlReady>
+<!--
+	
+//-->
+</SCRIPT>
+<style  type="text/css">  
+	*{
+		margin: 0;
+		padding: 0;
+	}
+	html,body,from {
+			width:100%;
+		height:100%;
+	}
+	#pdf{
+		width:100%;
+		height:100%;
+
+	}
+</style>
+
+<body id="bodyId" style="margin:0px 0px 0px 0px;overflow:hidden;"  onresize="document.getElementById('TrustedPDF1').height=document.documentElement.clientHeight">
+	<button onclick="Test()">Test</button> 
+	<button onclick="TrustedPDF1_Close()">TrustedPDF1_Close</button> 
+	<button onclick="init()">init</button> 	
+	    <div id="pdf">
+	     <script type="text/javascript" src="js/loadtrustedpdf.js"></script>
+	    </div>  
+	<!--<span id = "eventinfo"></span>
+	
+	<object  id="WebOffice1"
+                TYPE="application/x-itst-activex"
+                ALIGN="baseline" BORDER="0"
+                WIDTH="100%"HEIGHT="400"
+                clsid="{E77E049B-23FC-4DB8-B756-60529A35FAD5}" 
+                event_NotifyCtrlReady="NotifyCtrlReady"
+                event_NotifyToolBarClick="NotifyToolBarClick"
+                event_NotifyWordEvent="NotifyWordEvent">
+	</object>
+ 	-->	
+  <!--<button onclick="Test()">Test</button> 	-->
+</body>
+</html>

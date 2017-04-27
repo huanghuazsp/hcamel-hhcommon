@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>角色选择</title>
+<link rel="stylesheet" href="/common/jquery/mobile/jquery.mobile-1.4.0.min.css"	type="text/css">
+<script type="text/javascript" src="/common/jquery/jquery-1.9.1.js"></script>
+<script type="text/javascript" src="/common/jquery/mobile/jquery.mobile-1.4.0.min.js"></script>
+<link rel="stylesheet" href="/common/jquery/lymobile/framework.css"	type="text/css">
+<script type="text/javascript" src="/common/jquery/lymobile/framework.js"></script>
+</head>
+<body>
+	<div data-role="page" type="selectTreePage">
+		<div data-role="header"  data-theme="">
+			<h1>角色选择</h1>
+		</div>
+		<div data-role="content" >
+		<span id="userspan"></span>
+		<input id="selectTreePage_searchinput" value="" type="search">
+		<button class="ui-btn" onclick="selectTreeObject_4role.userselectsearch();">查询</button>
+		<fieldset data-role="collapsible" id="selectTreePage_listview">
+	    </fieldset>
+	    
+		    <div data-role="navbar" >
+				<ul>
+					<li>
+					<a type="selectTreeCancel"  class="ui-btn ui-shadow ui-corner-all">取消</a>
+					</li>
+					<li>
+					<a type="selectTreeOk" onClick="selectTreeObject_4role.save()" class="ui-btn ui-shadow ui-corner-all">确定</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+		<script>
+			var selectTreeObject_4role = {
+				pageId:$.lawyee.getTime(),
+				save : function(){
+					var dataList = selectTreeObject_4role.selectUserList;
+					var id = "";
+					var text = "";
+					for(var i =0;i<dataList.length;i++){
+						var data = dataList[i];
+						id+=data.id+",";
+						text+=data.name+",";
+					}
+					if(id!=""){
+						id=id.substr(0,id.length-1);
+						text=text.substr(0,text.length-1);
+					}
+					var resultObj ={};
+					resultObj.data = dataList;
+					resultObj.text=text;
+					resultObj.id=id;
+					selectTreeObject_4role.span.setValue(resultObj);
+					
+					$.lawyee.close();
+				},
+				selectUserListClick:function(id,text){
+					if(selectTreeObject_4role.spanConfig.selectType=='radio'){
+						selectTreeObject_4role.selectUserList=[{id:id,name:text}];
+						selectTreeObject_4role.renderSpanUserHtml();
+					}else{
+						if(selectTreeObject_4role.isInSelectUserList(id)){
+							selectTreeObject_4role.removeSelectUserList(id);
+						}else{
+							selectTreeObject_4role.addSelectUserList({id:id,name:text});
+						}
+					}
+				},
+				isInSelectUserList:function(id){
+					var userList = [];
+					for(var i = 0;i<selectTreeObject_4role.selectUserList.length; i++){
+						var selectUser = selectTreeObject_4role.selectUserList[i];
+						if(selectUser.id==id){
+							return true;
+						}
+					}
+					return false;
+				},
+				addSelectUserList:function(object){
+					var isin = selectTreeObject_4role.isInSelectUserList(object.id);
+					if(isin==false){
+						selectTreeObject_4role.selectUserList.push({
+							id : object.id,
+							name :object.name
+						});
+						selectTreeObject_4role.renderSpanUserHtml();
+					}
+				},
+				renderSpanUserHtml:function(){
+					var html ="";
+					for(var i=0;i<selectTreeObject_4role.selectUserList.length;i++){
+						var selectUser = selectTreeObject_4role.selectUserList[i];
+						html+='&nbsp;<span>'+selectUser.name
+						if(selectTreeObject_4role.selectTreeRequestParam.sort){
+							html+='&nbsp;&nbsp;<img src="/common/images/other/arrow-up.gif" onclick="up(\''+selectUser.id+'\')" />&nbsp;&nbsp;'
+							+'<img src="/common/images/other/arrow-down.gif" onclick="down(\''+selectUser.id+'\')" />&nbsp;&nbsp;';
+						}
+						html+='<img src="'+selectTreeObject_4role.contextPath+'/service/rest/fw.System/collection/img?path=/workflow/delete2.gif" onclick="selectTreeObject_4role.unSelect(\''+selectUser.id+'\')" />|</span>';
+					}
+					$('#userspan').html(html);
+				},
+
+				unSelect:function(id){
+					$('input[checkboxvalue='+id+']').prop('checked',false).checkboxradio('refresh');
+					selectTreeObject_4role.removeSelectUserList(id);
+				},
+
+				removeSelectUserList:function(id){
+					var userList = [];
+					for(var i = 0;i<selectTreeObject_4role.selectUserList.length; i++){
+						var selectUser = selectTreeObject_4role.selectUserList[i];
+						if(selectUser.id!=id){
+							userList.push(selectUser);
+						}
+					}
+					selectTreeObject_4role.selectUserList=userList;
+					selectTreeObject_4role.renderSpanUserHtml();
+				},
+				loadData_selectTreePage : function(objType){
+					$('#selectTreePage_xyy_li').remove();
+					if(selectTreeObject_4role.page_selectTreePage==1){
+						$('#selectTreePage_listview').empty();
+					}
+					$.lawyee.request(selectTreeObject_4role.url,{
+						data:{'pager.pageNo':selectTreeObject_4role.page_selectTreePage,'pager.pageSize':selectTreeObject_4role.pageSize_selectTreePage,op:selectTreeObject_4role.userNameStr_selectTreePage,userJsonList:selectTreeObject_4role.userJsonList,orgid:selectTreeObject_4role.orgid_param,type:selectTreeObject_4role.type_param,roleid:selectTreeObject_4role.page_role_roleId,isSelectUser:selectTreeObject_4role.isSelectUser},
+						callback : function(result){
+							var items = result.rows;
+							if(parseInt((result['pager.totalRows']-1)/selectTreeObject_4role.pageSize_selectTreePage)+1==selectTreeObject_4role.page_selectTreePage){
+								selectTreeObject_4role.isLoad_selectTreePage=0;
+							}else{
+								selectTreeObject_4role.isLoad_selectTreePage=1;
+							}
+							var	controlgroup = $('<div data-role="controlgroup"></div>');
+							controlgroup.append($('<legend>第'+selectTreeObject_4role.page_selectTreePage+'页,显示'+((selectTreeObject_4role.page_selectTreePage-1)*selectTreeObject_4role.pageSize_selectTreePage+1)+'-'+((selectTreeObject_4role.page_selectTreePage-1)*selectTreeObject_4role.pageSize_selectTreePage+items.length)+',共'+result['pager.totalRows']+'条</legend>'));
+							selectTreeObject_4role.page_selectTreePage++;
+							for(var i=0;i<items.length;i++){
+								var item= items[i];
+								var checked = '';
+								if(selectTreeObject_4role.isInSelectUserList(item.id)){
+									checked='checked';
+								}
+								var html='<input '+checked+' onclick="selectTreeObject_4role.selectUserListClick(\''+item.id+'\',\''+item.name+'\')" name=\'selectTreePage_radio\' id="selectTreePage_'+item.id+'" checkboxvalue="'+item.id+'" value="'+item.id+'" text="'+item.name+'" type="'+(selectTreeObject_4role.spanConfig.selectType=='check'?'checkbox':'radio')+'"><label for="selectTreePage_'+item.id+'">'+item.name+'</label>';
+								controlgroup.append($(html));
+							}
+							$('#selectTreePage_listview').append(controlgroup);
+							if(selectTreeObject_4role.isLoad_selectTreePage==0||1==objType){
+								$('#selectTreePage_listview').append($('<button class="ui-btn ui-corner-all" >数据加载完了...</button>'));
+							}
+							else{
+								$('#selectTreePage_listview').append($('<button id="selectTreePage_xyy_li" class="ui-btn ui-corner-all" onclick="selectTreeObject_4role.loadData_selectTreePage(0);">下一页</button>'));
+							}
+							$('#selectTreePage_listview').trigger('create');
+						}
+					});
+				},
+				userselectsearch:function(){
+					selectTreeObject_4role.userNameStr_selectTreePage=$('#selectTreePage_searchinput').val();
+					selectTreeObject_4role.page_selectTreePage=1;
+					selectTreeObject_4role.isLoad_selectTreePage = 1;
+					selectTreeObject_4role.type_param=null;
+					selectTreeObject_4role.orgid_param=null;
+					selectTreeObject_4role.page_role_roleId=null;
+					selectTreeObject_4role.loadData_selectTreePage(0);
+				}
+			}
+			selectTreeObject_4role.selectTreeRequestParam = $.lawyee.getIframeParams();
+			selectTreeObject_4role.span = selectTreeObject_4role.selectTreeRequestParam.span;
+			
+			selectTreeObject_4role.contextPath=selectTreeObject_4role.span.data('contextPath');
+			selectTreeObject_4role.url = selectTreeObject_4role.contextPath+'/service/rest/lawyee.workflowOrganizationServiceUtil/0/queryRoleList';
+			selectTreeObject_4role.isSelectUser = selectTreeObject_4role.span.data('isSelectUser');
+			selectTreeObject_4role.userJsonList=selectTreeObject_4role.span.data('userJsonList');
+			selectTreeObject_4role.spanConfig = selectTreeObject_4role.span.data('config');
+			if(selectTreeObject_4role.userJsonList){
+				selectTreeObject_4role.userJsonList=selectTreeObject_4role.userJsonList.replace(/@@@/g, '"');
+			}
+			selectTreeObject_4role.selectUserList = [];
+			selectTreeObject_4role.orgid_param=null;
+			selectTreeObject_4role.type_param=null;
+			selectTreeObject_4role.orgpanelidtype='';
+			selectTreeObject_4role.page_selectTreePage = 1;
+			selectTreeObject_4role.pageSize_selectTreePage = 10;
+			selectTreeObject_4role.pageSize_role_selectTreePage=5;
+			selectTreeObject_4role.isLoad_selectTreePage = 1;
+			selectTreeObject_4role.page_role_selectTreePage = 1;
+			selectTreeObject_4role.isLoad_role_selectTreePage=1;
+			selectTreeObject_4role.userNameStr_selectTreePage ='';
+			selectTreeObject_4role.page_role_roleId = null;
+
+			$(function(){
+				if(selectTreeObject_4role.span.getValueData()){
+					if(selectTreeObject_4role.span.data('selectType') != 'check'){
+						selectTreeObject_4role.selectUserList.push(selectTreeObject_4role.span.getValueData());
+					}else{
+						for(var i=0;i<selectTreeObject_4role.span.getValueData().length;i++){
+							selectTreeObject_4role.selectUserList.push(selectTreeObject_4role.span.getValueData()[i]);
+						}
+					}
+				}
+				if(selectTreeObject_4role.selectUserList==null){
+					selectTreeObject_4role.selectUserList=[];
+				}
+				selectTreeObject_4role.renderSpanUserHtml();
+
+
+				$('[type=selectTreeCancel]').click(function(){
+					$.lawyee.close();
+				});
+				
+				selectTreeObject_4role.loadData_selectTreePage();
+			});
+		</script>
+	</div>
+</body>
+</html>

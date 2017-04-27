@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>人员选择</title>
+<link rel="stylesheet" href="/common/jquery/mobile/jquery.mobile-1.4.0.min.css"	type="text/css">
+<script type="text/javascript" src="/common/jquery/jquery-1.9.1.js"></script>
+<script type="text/javascript" src="/common/jquery/mobile/jquery.mobile-1.4.0.min.js"></script>
+<link rel="stylesheet" href="/common/jquery/lymobile/framework.css"	type="text/css">
+<script type="text/javascript" src="/common/jquery/lymobile/framework.js"></script>
+</head>
+<body>
+	<div data-role="page" type="selectTreePage" id="selectTreePage" style="">
+		<div data-role="panel" id="selectTreePage_orgpanel" data-display="overlay">
+	        <div data-role="header"  data-theme=""  style="text-align:right">
+				<h1>机构</h1>
+				<a href="#"  onclick="selectTreeObject_4staff.orgpanelback()" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-arrow-l">上一级</a>
+			</div>
+	       		 <ul id="selectTreePage_orgpanel_radio" data-role="listview" data-filter="false" data-filter-placeholder="输入查询条件..." data-inset="true">
+				    <li><a>正在加载...</a></li>
+				</ul>
+		</div>
+		<div data-role="panel" id="selectTreePage_rolepanel" data-position="right" data-display="overlay">
+	        <div data-role="header"  data-theme=""  style="text-align:right">
+				<h1>角色</h1>
+			</div>
+	       	<ul id="rolepanel_listview_selectTreePage" data-role="listview" data-filter="false" data-filter-placeholder="输入查询条件..." data-inset="true">
+				    <li><a>正在加载...</a></li>
+			</ul>
+		</div>
+		<div data-role="header" noremove="true" data-theme="">
+			<a href="#selectTreePage_orgpanel"  class="ui-btn ui-shadow ui-corner-all ui-btn-inline ui-btn-mini">按机构</a>
+			<a href="#selectTreePage_rolepanel"  class="ui-btn ui-shadow ui-corner-all ui-btn-inline ui-btn-mini">按角色</a>
+			<h1>人员选择</h1>
+		</div>
+		<div data-role="content" >
+		<span id="userspan"></span>
+		<input id="selectTreePage_searchinput" value="" type="search">
+		<button class="ui-btn" onclick="selectTreeObject_4staff.userselectsearch();">查询</button>
+		<fieldset data-role="collapsible" id="selectTreePage_listview">
+	    </fieldset>
+	    	<div data-role="navbar" >
+				<ul>
+					<li>
+					<a type="selectTreeCancel"  class="ui-btn ui-shadow ui-corner-all">取消</a>
+					</li>
+					<li>
+					<a type="selectTreeOk" onClick="selectTreeObject_4staff.save()" class="ui-btn ui-shadow ui-corner-all">确定</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+		<script>
+			var selectTreeObject_4staff = {
+				pageId:$.lawyee.getTime(),
+				save : function(){
+					var dataList = selectTreeObject_4staff.selectUserList;
+					var id = "";
+					var text = "";
+					for(var i =0;i<dataList.length;i++){
+						var data = dataList[i];
+						id+=data.id+",";
+						text+=data.name+",";
+					}
+					if(id!=""){
+						id=id.substr(0,id.length-1);
+						text=text.substr(0,text.length-1);
+					}
+					var resultObj ={};
+					resultObj.data = dataList;
+					resultObj.text=text;
+					resultObj.id=id;
+					var span1 = selectTreeObject_4staff.span;
+					span1.setValue(resultObj);
+					var onSelect = span1.data('onSelect');
+					if(onSelect){
+						onSelect(dataList,span1);
+					}
+					$.lawyee.close();
+				},
+				selectUserListClick:function(id,text){
+					if(selectTreeObject_4staff.spanConfig.selectType=='radio'){
+						selectTreeObject_4staff.selectUserList=[{id:id,name:text}];
+						selectTreeObject_4staff.renderSpanUserHtml();
+					}else{
+						if(selectTreeObject_4staff.isInSelectUserList(id)){
+							selectTreeObject_4staff.removeSelectUserList(id);
+						}else{
+							selectTreeObject_4staff.addSelectUserList({id:id,name:text});
+						}
+					}
+				},
+				isInSelectUserList:function(id){
+					var userList = [];
+					for(var i = 0;i<selectTreeObject_4staff.selectUserList.length; i++){
+						var selectUser = selectTreeObject_4staff.selectUserList[i];
+						if(selectUser.id==id){
+							return true;
+						}
+					}
+					return false;
+				},
+				addSelectUserList:function(object){
+					var isin = selectTreeObject_4staff.isInSelectUserList(object.id);
+					if(isin==false){
+						selectTreeObject_4staff.selectUserList.push({
+							id : object.id,
+							name :object.name
+						});
+						selectTreeObject_4staff.renderSpanUserHtml();
+					}
+				},
+				renderSpanUserHtml:function(){
+					var html ="";
+					for(var i=0;i<selectTreeObject_4staff.selectUserList.length;i++){
+						var selectUser = selectTreeObject_4staff.selectUserList[i];
+						html+='&nbsp;<span>'+selectUser.name
+						if(selectTreeObject_4staff.selectTreeRequestParam.sort){
+							html+='&nbsp;&nbsp;<img src="/common/images/other/arrow-up.gif" onclick="up(\''+selectUser.id+'\')" />&nbsp;&nbsp;'
+							+'<img src="/common/images/other/arrow-down.gif" onclick="down(\''+selectUser.id+'\')" />&nbsp;&nbsp;';
+						}
+						html+='<img src="'+selectTreeObject_4staff.contextPath+'/service/rest/fw.System/collection/img?path=/workflow/delete2.gif" onclick="selectTreeObject_4staff.unSelect(\''+selectUser.id+'\')" />|</span>';
+					}
+					$('#userspan').html(html);
+				},
+
+				unSelect:function(id){
+					$('input[checkboxvalue='+id+']').prop('checked',false).checkboxradio('refresh');
+					selectTreeObject_4staff.removeSelectUserList(id);
+				},
+
+				removeSelectUserList:function(id){
+					var userList = [];
+					for(var i = 0;i<selectTreeObject_4staff.selectUserList.length; i++){
+						var selectUser = selectTreeObject_4staff.selectUserList[i];
+						if(selectUser.id!=id){
+							userList.push(selectUser);
+						}
+					}
+					selectTreeObject_4staff.selectUserList=userList;
+					selectTreeObject_4staff.renderSpanUserHtml();
+				},
+				orgpanelback:function(){
+					var index =  selectTreeObject_4staff.orgpanelidtype.lastIndexOf(',');
+					selectTreeObject_4staff.orgpanelidtype=selectTreeObject_4staff.orgpanelidtype.substr(0,index);
+					index =  selectTreeObject_4staff.orgpanelidtype.lastIndexOf(',');
+					var idtype = selectTreeObject_4staff.orgpanelidtype.substr(index+1).split('#');
+					selectTreeObject_4staff.orgpanelidtype=selectTreeObject_4staff.orgpanelidtype.substr(0,index);
+					selectTreeObject_4staff.loadOrgList(idtype[0],idtype[1]);
+				},
+				loadOrgList:function(id,type){
+					if(id){
+						selectTreeObject_4staff.orgpanelidtype+=','+id+'#'+type;
+					}
+					$('#selectTreePage_orgpanel_radio').empty();
+					$.lawyee.request(selectTreeObject_4staff.contextPath+'/service/rest/lawyee.staffService/0/odZTreeAllN',{
+						data : {id:id,type:type},
+						callback : function(resultList){
+							for(var i=0;i<resultList.length;i++){
+								var item = resultList[i];
+								var name = item.name;
+								if(item.type=='organization'){
+									name=item.name+'<font color=red>（机构）</font>';
+								}else if(item.type=='department'){
+									name=item.name+'<font color=red>（部门）</font>';
+								}else if(item.type=='job'){
+									name=item.name+'<font color=red>（岗位）</font>';
+								}
+								var html='<li><a onclick="selectTreeObject_4staff.userselectsearchByOrg(\''+item.id+'\',\''+item.type+'\')"  data-rel="close"><p>'+name+'</p></a>';
+								if(item.isParent){
+									html+='<a href="javascript:selectTreeObject_4staff.loadOrgList(\''+item.id+'\',\''+item.type+'\',\''+id+'\',\''+type+'\')"  >下一级</a></li>';
+								}
+								$('#selectTreePage_orgpanel_radio').append($(html));
+							}
+							$('#selectTreePage_orgpanel_radio').listview('refresh');
+						}
+					});
+				},
+				loadData_role_selectTreePage : function(){
+					$('#selectTreePage_role_xyy_li').remove();
+					if(selectTreeObject_4staff.page_role_selectTreePage==1){
+						$('#rolepanel_listview_selectTreePage').empty();
+					}
+					$.lawyee.request(selectTreeObject_4staff.contextPath+'/service/rest/lawyee.workflowOrganizationServiceUtil/0/queryRoleList',{
+						data:{'pager.pageNo':selectTreeObject_4staff.page_role_selectTreePage,'pager.pageSize':selectTreeObject_4staff.pageSize_role_selectTreePage},
+						callback : function(result){
+							var items = result.rows;
+							if(parseInt((result['pager.totalRows']-1)/selectTreeObject_4staff.pageSize_role_selectTreePage)+1==selectTreeObject_4staff.page_role_selectTreePage){
+								selectTreeObject_4staff.isLoad_role_selectTreePage=0;
+							}
+							$('#rolepanel_listview_selectTreePage').append($('<li data-role="list-divider">第'+selectTreeObject_4staff.page_role_selectTreePage+'页,显示'+((selectTreeObject_4staff.page_role_selectTreePage-1)*selectTreeObject_4staff.pageSize_role_selectTreePage+1)+'-'+((selectTreeObject_4staff.page_role_selectTreePage-1)*selectTreeObject_4staff.pageSize_role_selectTreePage+items.length)+',共'+result['pager.totalRows']+'条</li>'));
+							selectTreeObject_4staff.page_role_selectTreePage++;
+							for(var i=0;i<items.length;i++){
+								var item= items[i];
+								var html='<li><a href="javascript:selectTreeObject_4staff.userselectsearchByRole(\''+item.id+'\')">'+item.name+'</a></li>';
+								$('#rolepanel_listview_selectTreePage').append($(html));
+							}
+							if(selectTreeObject_4staff.isLoad_role_selectTreePage==0){
+								$('#rolepanel_listview_selectTreePage').append($('<li data-role="list-divider">数据已经加载完了...</li>'));
+							}
+							else{
+								$('#rolepanel_listview_selectTreePage').append($('<button id="selectTreePage_role_xyy_li" class="ui-btn ui-corner-all" onclick="selectTreeObject_4staff.loadData_role_selectTreePage();">下一页</button>'));
+							}
+							$('#rolepanel_listview_selectTreePage').listview('refresh');
+						}
+					});
+				},
+				loadData_selectTreePage : function(objType){
+					$('#selectTreePage_xyy_li').remove();
+					if(selectTreeObject_4staff.page_selectTreePage==1){
+						$('#selectTreePage_listview').empty();
+					}
+					$.lawyee.request(selectTreeObject_4staff.url,{
+						data:{'pager.pageNo':selectTreeObject_4staff.page_selectTreePage,'pager.pageSize':selectTreeObject_4staff.pageSize_selectTreePage,username:selectTreeObject_4staff.userNameStr_selectTreePage,userJsonList:selectTreeObject_4staff.userJsonList,orgid:selectTreeObject_4staff.orgid_param,type:selectTreeObject_4staff.type_param,roleid:selectTreeObject_4staff.page_role_roleId,isSelectUser:selectTreeObject_4staff.isSelectUser},
+						callback : function(result){
+							var items = result.rows;
+							if(parseInt((result['pager.totalRows']-1)/selectTreeObject_4staff.pageSize_selectTreePage)+1==selectTreeObject_4staff.page_selectTreePage){
+								selectTreeObject_4staff.isLoad_selectTreePage=0;
+							}else{
+								selectTreeObject_4staff.isLoad_selectTreePage=1;
+							}
+							var	controlgroup = $('<div data-role="controlgroup"></div>');
+							controlgroup.append($('<legend>第'+selectTreeObject_4staff.page_selectTreePage+'页,显示'+((selectTreeObject_4staff.page_selectTreePage-1)*selectTreeObject_4staff.pageSize_selectTreePage+1)+'-'+((selectTreeObject_4staff.page_selectTreePage-1)*selectTreeObject_4staff.pageSize_selectTreePage+items.length)+',共'+result['pager.totalRows']+'条</legend>'));
+							selectTreeObject_4staff.page_selectTreePage++;
+							for(var i=0;i<items.length;i++){
+								var item= items[i];
+								var checked = '';
+								if(selectTreeObject_4staff.isInSelectUserList(item.id)){
+									checked='checked';
+								}
+								/*var html='<input '+checked+' onclick="selectTreeObject_4staff.selectUserListClick(\''+item.id+'\',\''+item.name+'\')" name=\'selectTreePage_radio\' id="selectTreePage_'+item.id+'" checkboxvalue="'+item.id+'" value="'+item.id+'" text="'+item.name+'" type="'+(selectTreeObject_4staff.spanConfig.selectType=='on'?'radio':'checkbox')+'"><label for="selectTreePage_'+item.id+'">'+item.name+'</label>';
+								controlgroup.append($(html));*/
+								var html='<input '+checked+' onclick="selectTreeObject_4staff.selectUserListClick(\''+item.id+'\',\''+item.name+'\')" name=\'selectTreePage_radio\' id="selectTreePage_'+item.id+'" checkboxvalue="'+item.id+'" value="'+item.id+'" text="'+item.name+'" type="'+(selectTreeObject_4staff.spanConfig.selectType=='check'?'checkbox':'radio')+'"><label for="selectTreePage_'+item.id+'">'+item.name+'</label>';
+								controlgroup.append($(html));
+							}
+							$('#selectTreePage_listview').append(controlgroup);
+							if(selectTreeObject_4staff.isLoad_selectTreePage==0||1==objType){
+								$('#selectTreePage_listview').append($('<button class="ui-btn ui-corner-all" >数据加载完了...</button>'));
+							}
+							else{
+								$('#selectTreePage_listview').append($('<button id="selectTreePage_xyy_li" class="ui-btn ui-corner-all" onclick="selectTreeObject_4staff.loadData_selectTreePage(0);">下一页</button>'));
+							}
+							$('#selectTreePage_listview').trigger('create');
+						}
+					});
+				},
+				userselectsearchByRole:function(roleId){
+					selectTreeObject_4staff.page_selectTreePage=1;
+					selectTreeObject_4staff.isLoad_selectTreePage = 1;
+					selectTreeObject_4staff.page_role_roleId=roleId;
+					selectTreeObject_4staff.url = selectTreeObject_4staff.contextPath+'/service/rest/lawyee.workflowOrganizationServiceUtil/collection/grdStaffListByRoleQui';
+					$('#selectTreePage_rolepanel').panel('close');
+					selectTreeObject_4staff.loadData_selectTreePage(1);
+				},
+				userselectsearchByOrg:function(orgid,type){
+					selectTreeObject_4staff.page_selectTreePage=1;
+					selectTreeObject_4staff.isLoad_selectTreePage = 1;
+					selectTreeObject_4staff.url = selectTreeObject_4staff.contextPath+'/service/rest/lawyee.workflowOrganizationServiceUtil/collection/grdStaffListByOrgIdQui';
+					selectTreeObject_4staff.type_param=type;
+					selectTreeObject_4staff.orgid_param=orgid;
+					selectTreeObject_4staff.page_role_roleId=null;
+					$('#selectTreePage_orgpanel').panel('close');
+					selectTreeObject_4staff.loadData_selectTreePage(1);
+				},
+				userselectsearch:function(){
+					selectTreeObject_4staff.userNameStr_selectTreePage=$('#selectTreePage_searchinput').val();
+					selectTreeObject_4staff.page_selectTreePage=1;
+					selectTreeObject_4staff.isLoad_selectTreePage = 1;
+					selectTreeObject_4staff.type_param=null;
+					selectTreeObject_4staff.orgid_param=null;
+					selectTreeObject_4staff.page_role_roleId=null;
+					selectTreeObject_4staff.loadData_selectTreePage(0);
+				}
+			}
+			selectTreeObject_4staff.selectTreeRequestParam = $.lawyee.getIframeParams();
+			selectTreeObject_4staff.span = selectTreeObject_4staff.selectTreeRequestParam.span;
+			
+			selectTreeObject_4staff.contextPath=selectTreeObject_4staff.span.data('contextPath');
+			selectTreeObject_4staff.url = selectTreeObject_4staff.contextPath+'/service/rest/workflow.ComUtil/collection/userGrid';
+			selectTreeObject_4staff.isSelectUser = selectTreeObject_4staff.span.data('isSelectUser');
+			selectTreeObject_4staff.userJsonList=selectTreeObject_4staff.span.data('userJsonList');
+			selectTreeObject_4staff.spanConfig = selectTreeObject_4staff.span.data('config');
+			if(selectTreeObject_4staff.userJsonList){
+				selectTreeObject_4staff.userJsonList=selectTreeObject_4staff.userJsonList.replace(/@@@/g, '"');
+			}
+			selectTreeObject_4staff.selectUserList = [];
+			selectTreeObject_4staff.orgid_param=null;
+			selectTreeObject_4staff.type_param=null;
+			selectTreeObject_4staff.orgpanelidtype='';
+			selectTreeObject_4staff.page_selectTreePage = 1;
+			selectTreeObject_4staff.pageSize_selectTreePage = 10;
+			selectTreeObject_4staff.pageSize_role_selectTreePage=5;
+			selectTreeObject_4staff.isLoad_selectTreePage = 1;
+			selectTreeObject_4staff.page_role_selectTreePage = 1;
+			selectTreeObject_4staff.isLoad_role_selectTreePage=1;
+			selectTreeObject_4staff.userNameStr_selectTreePage ='';
+			selectTreeObject_4staff.page_role_roleId = null;
+
+			$(function(){
+				if(selectTreeObject_4staff.span.getValueData()){
+					if(selectTreeObject_4staff.span.data('selectType') != 'check'){
+						selectTreeObject_4staff.selectUserList.push(selectTreeObject_4staff.span.getValueData());
+					}else{
+						for(var i=0;i<selectTreeObject_4staff.span.getValueData().length;i++){
+							selectTreeObject_4staff.selectUserList.push(selectTreeObject_4staff.span.getValueData()[i]);
+						}
+					}
+				}
+				if(selectTreeObject_4staff.selectUserList==null){
+					selectTreeObject_4staff.selectUserList=[];
+				}
+				selectTreeObject_4staff.renderSpanUserHtml();
+
+				$('[type=selectTreeCancel]').click(function(){
+					$.lawyee.close();
+				});
+				
+				selectTreeObject_4staff.loadData_selectTreePage(0);
+				$('#selectTreePage_orgpanel').panel({
+					open :function(e,ui){
+						if($('#selectTreePage_orgpanel').prop('isinit')==null){
+							$('#selectTreePage_orgpanel').prop('isinit',true);
+							selectTreeObject_4staff.loadOrgList();
+						}
+					}
+				});
+				$('#selectTreePage_rolepanel').panel({
+					open :function(e,ui){
+						if($('#selectTreePage_rolepanel').prop('isinit')==null){
+							$('#selectTreePage_rolepanel').prop('isinit',true);
+							selectTreeObject_4staff.loadData_role_selectTreePage();
+						}
+					}
+				});
+				
+			});
+		</script>
+	</div>
+</body>
+</html>

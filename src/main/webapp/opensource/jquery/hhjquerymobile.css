@@ -1,0 +1,119 @@
+.mobileTable{
+	width : 100%
+}
+
+.groupTitle{
+	font-size: 1em;
+	padding : 10px 4px; 
+	text-align: left;
+	border-bottom:2px solid #BEBEBE;
+}
+.groupTitle span{
+	font-size:16px;
+	font-weight:bold;
+	text-align:center;
+}
+
+/*.ui-field-contain{
+	margin: 0.5em 0;
+	padding: 0.2em 0;
+}*/
+.ui-field-contain{
+	margin: 0.1em 0;
+	padding: 0.1em 0;
+}
+
+.ui-listview .ui-li-aside {
+	position: absolute;
+	top: 0.5em;
+	right: 1em;
+	margin: 0;
+	text-align: right;
+}
+
+.ui-listview .ui-left-top {
+	position: absolute;
+	top: 0.5em;
+	left: 1.5em;
+	margin: 0;
+	text-align: left;
+}
+
+.ui-listview .ui-right-bottom {
+	position: absolute;
+	bottom: 0.5em;
+	right: 1em;
+	margin: 0;
+	text-align: right;
+}
+
+.ui-listview .ui-left-bottom {
+	position: absolute;
+	bottom: 0.5em;
+	left: 1.5em;
+	margin: 0;
+	text-align: left;
+}
+
+.ui-select .ui-btn > span:not(.ui-li-count) {
+	display: block;
+	text-overflow: ellipsis;
+	overflow: hidden !important;
+	/*white-space: nowrap;*/
+	white-space: normal;
+}
+
+.ui-listview > .ui-li-static,
+.ui-listview > .ui-li-divider,
+.ui-listview > li > a.ui-btn {
+	margin: 0;
+	display: block;
+	position: relative;
+	text-align: left;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	/*white-space: nowrap;*/
+	white-space: normal;
+}
+
+
+/*========列表的刷新图片=======*/
+.hh_yellow {
+	border-radius: 4px;
+	-moz-border-radius: 4px;
+	border: 1px solid #fcefa1;
+	background: #fbf9ee 50% 50% repeat-x;
+	color: #363636;
+	padding-left: 3px;
+	padding-right: 3px;
+}
+
+.hh_red {
+	border-radius: 4px;
+	-moz-border-radius: 4px;
+	border: 1px solid #cd0a0a;
+	background: #fef1ec 50% 50% repeat-x;
+	color: #cd0a0a;
+	padding-left: 3px;
+	padding-right: 3px;
+}
+
+.hh_green {
+	border-radius: 4px;
+	-moz-border-radius: 4px;
+	border: 1px solid green;
+	background: #eeffea 50% 50% repeat-x;
+	color: green;
+	padding-left: 3px;
+	padding-right: 3px;
+}
+
+.hh_blue {
+	border-radius: 4px;
+	-moz-border-radius: 4px;
+	border: 1px solid blue;
+	background: azure 50% 50% repeat-x;
+	color: #363636;
+	padding-left: 3px;
+	padding-right: 3px;
+}
