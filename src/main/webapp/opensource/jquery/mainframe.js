@@ -343,6 +343,22 @@ $.hh.watermark = function(input, watermark) {
 $.hh.stringToDate = function(str) {
 	return new Date(str.replace(/-/g, "/"));
 }
+
+$.hh.xmlCompression = function(source) {
+	if(!source){
+		return '';
+	}
+    var rep = /\n+/g;
+    var repone = /<!--.*?-->/ig;
+    var reptwo = /\/\*.*?\*\//ig;
+    var reptree = /[ ]+</ig;
+    var sourceZero = source.replace(rep,"");
+    var sourceOne = sourceZero.replace(repone,"");
+    var sourceTwo = sourceOne.replace(reptwo,"");
+    var sourceTree = sourceTwo.replace(reptree,"<");
+    return sourceTree;
+}
+
 $.hh.formatDate = function(d, fmt) {
 	fmt = fmt || 'yyyy-MM-dd';
 	var zeroize = function(value, length) {
